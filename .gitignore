@@ -31,3 +31,7 @@
 # Debug files
 *.dSYM/
 *.su
+/core/
+/libraries/
+/Uno/
+/Attiny85/
