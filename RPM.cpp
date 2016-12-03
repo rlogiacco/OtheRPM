@@ -5,24 +5,7 @@
 #include <elapsedMillis.h>
 #include <FormattingSerialDebug.h>
 
-//#define NUM_DIGITS 4
-//#define DIGIT_1_PIN 1
-//#define DIGIT_2_PIN 2
-//#define DIGIT_3_PIN 3
-//#define DIGIT_4_PIN 4
-//
-//#define SEG_A_PIN 1
-//#define SEG_B_PIN 2
-//#define SEG_C_PIN 3
-//#define SEG_D_PIN 4
-//#define SEG_E_PIN 5
-//#define SEG_F_PIN 6
-//#define SEG_G_PIN 7
-//#define SEG_DP_PIN 8
-
-
-
-LedControl ledControl = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 1);
+LedControl ledControl = LedControl(DIN_PIN, CLK_PIN, CS_PIN);
 
 void display(unsigned long num) {
 #if (COMMON_ANODE)
@@ -46,7 +29,6 @@ void display(unsigned long num) {
 #endif
 }
 
-//SevSeg display;
 elapsedMillis ms;
 
 void setup() {
@@ -57,6 +39,9 @@ void setup() {
 	ledControl.shutdown(0, false);
 	ledControl.setIntensity(0, 15);
 	ledControl.clearDisplay(0);
+#if (!COMMON_ANODE)
+	ledControl.setScanLimit(0, 3);
+#endif
 }
 
 volatile unsigned long counter = 0;

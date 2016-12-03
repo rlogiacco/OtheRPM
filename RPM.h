@@ -9,7 +9,7 @@
 #include "Arduino.h"
 
 #define REFRESH_INTERVAL 500
-#define COMMON_ANODE false
+#define COMMON_ANODE true
 #define SERIAL_DEBUG true
 
 #if defined (__AVR_ATtiny85__)
