@@ -10,21 +10,26 @@
 
 #define REFRESH_INTERVAL 500
 #define COMMON_ANODE true
-#define SERIAL_DEBUG true
 
 #if defined (__AVR_ATtiny85__)
+#define SERIAL_DEBUG false
+
 #define DIN_PIN 2
 #define CLK_PIN 1
 #define CS_PIN 0
+
+#define INTERRUPTPIN PCINT4
+#define READPIN PINB4
 #define SENSE_PIN 4
-#define INT SENSE_PIN
-#define SERIAL_DEBUG false
-#else
+#else // arduino
+#define SERIAL_DEBUG true
+
 #define DIN_PIN 9
 #define CLK_PIN 13
 #define CS_PIN 8
+
 #define SENSE_PIN 2
-#define INT digitalPinToInterrupt(SENSE_PIN)
+
 #endif
 
 void detect();
