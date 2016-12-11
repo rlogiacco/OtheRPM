@@ -21,7 +21,7 @@
 #define BATT_LOW 3.4
 // voltage sensing divider ratio
 #define R1 10.0
-#define R2 20.0
+#define R2 10.0
 #define BATT_LOW_BLINK_INTERVAL 250
 
 
