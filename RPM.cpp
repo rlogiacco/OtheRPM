@@ -31,17 +31,16 @@ void display(unsigned long num) {
 }
 
 elapsedMillis ms;
-
 void setup() {
 	cli();
 	SERIAL_DEBUG_SETUP(9600);
-	pinMode(SENSE_PIN, INPUT_PULLUP);
+	pinMode(INT_PIN, INPUT_PULLUP);
 
-#if defined (__AVR_ATtiny85__)
+#ifdef __AVR_ATtiny85__
 	PCMSK |= (1 << INTERRUPTPIN); // set pin change mask to listen to pin state changes
 	GIMSK |= (1 << PCIE);   // enable PCINT interrupt in the general interrupt mask
 #else //arduino
-	attachInterrupt(digitalPinToInterrupt(SENSE_PIN), detect, FALLING);
+	attachInterrupt(digitalPinToInterrupt(INT_PIN), detect, FALLING);
 #endif
 
 	ledControl.shutdown(0, false);
@@ -51,27 +50,29 @@ void setup() {
 	ledControl.setScanLimit(0, 3);
 #endif
 	sei();
+
+	pinMode(SENSE_PIN, INPUT);
 }
 
 volatile unsigned long counter = 0;
-CircularBuffer<unsigned long, 5> buff = CircularBuffer<unsigned long, 5>();
+unsigned int battery_warning = 0;
 
 void loop() {
+	if (battery_warning > 0 && ms >= (BATT_LOW_BLINK_INTERVAL * battery_warning)) {
+		ledControl.setIntensity(0, ((battery_warning++ % 2) * 7) + 8);
+	}
 	if (ms >= REFRESH_INTERVAL) {
 		unsigned long rpm = (60000 / ms) * counter;
 		DEBUG("CNT %lu in %lums = RPM %lu", counter, (unsigned long )ms, rpm);
 		counter = 0;
 		ms = 0;
-#ifdef AVERAGE
-		buff.push(rpm);
-		rpm = 0;
-		for (uint8_t i = 0; i < buff.count(); i++) {
-			rpm += buff.values()[i];
-		}
-		display(rpm / buff.count());
-		DEBUG("DISPLAY RPM %lu", rpm / buff.count());
-#else
+
 		display(rpm);
+#if (MONITOR_BATTERY)
+		float voltage = analogRead(SENSE_PIN) * VIN / 1023 * ((R1 + R2) / R2);
+		if (battery_warning == 0 && voltage < BATT_LOW) {
+			battery_warning = 1;
+		}
 #endif
 	}
 }
